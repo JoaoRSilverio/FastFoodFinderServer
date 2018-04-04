@@ -1,0 +1,362 @@
+<html>
+
+<head>
+    <script src="https://code.jquery.com/jquery-3.3.1.js" integrity="sha256-2Kok7MbOyxpgUVvAk/HJ2jigOSYS2auK4Pfzbm7uH60=" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q"
+        crossorigin="anonymous"></script>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm"
+        crossorigin="anonymous">
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl"
+        crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.7.2/Chart.bundle.js"></script>
+
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <script async src="dashboard.js"></script>
+</head>
+
+<body>
+    <style>
+        body {
+            background-color: dodgerblue;
+        }
+
+        .form-control {
+            margin-top: 15px;
+
+        }
+
+        .admintab-a {
+            border-radius: 12px;
+            background-color: rgba(255, 255, 255, 0.87);
+            -webkit-box-shadow: 1.86px 1.86px 3.72px 0px rgba(0, 0, 0, 0.2);
+            -moz-box-shadow: 1.86px 1.86px 3.72px 0px rgba(0, 0, 0, 0.2);
+            box-shadow: 1.86px 1.86px 3.72px 0px rgba(0, 0, 0, 0.2);
+            padding: 30px;
+            padding-left: 45px;
+        }
+
+        .admintab-b {
+            background-color: rgba(255, 255, 255, 0.87);
+            border-radius: 12px;
+            padding: 30px;
+            -webkit-box-shadow: 1.86px 1.86px 3.72px 0px rgba(0, 0, 0, 0.2);
+            -moz-box-shadow: 1.86px 1.86px 3.72px 0px rgba(0, 0, 0, 0.2);
+            box-shadow: 1.86px 1.86px 3.72px 0px rgba(0, 0, 0, 0.2);
+        }
+
+        .edit_field {
+            font-size: 1em;
+            border: 0;
+            border-bottom: 1px solid #17a2b8;
+            height: 1em;
+            padding-bottom: 0px;
+            margin-bottom: 7px;
+            width: auto;
+
+        }
+
+        .saveloc {
+            font-size: 0.8em;
+            margin-left: 30px;
+            background-color: #138496;
+            color: white;
+            padding: 5px;
+            border-radius: 5px;
+        }
+
+        .saveloc:hover {
+            background-color: #2394a6;
+            color: white;
+            cursor: pointer;
+        }
+
+        .btnAddFoodChain {
+            margin-top: 15px;
+        }
+
+        .txtBrandName {
+            margin-top: 15px;
+            width: auto;
+        }
+
+        .stat-result {
+            color: dodgerblue;
+            margin-left: 5px;
+            margin-right: 10px;
+
+        }
+
+        .legend {
+            font-size: 0.6em;
+            background-color: lightgray;
+            border-radius: 12px;
+            padding: 15px;
+            margin-bottom: 30px;    
+        }
+
+        .foodchainstats {
+            display: flex;
+            flex-flow: row wrap;
+
+            font-weight: 500;
+        }
+        .foodchainpanel{
+            height: 300px;
+            width: 100%;
+            padding: 15px;
+            overflow-y: scroll;
+        }
+    </style>
+    <div class="container">
+        <div class="row" style="font-size:0.7em;padding:15px;background-color:darkgreen;color:white;margin-bottom:35px;">
+            <div class="meta-info">Searches Today:
+                <span>360049000</span>
+            </div>
+        </div>
+        <!-- LOCATIONS MANAGEMENT -->
+        <div class="row">
+            <div class="insertpanel admintab-a col-lg-6 col-md-6 col-xs-12 col-sm-12">
+
+                <h1>New Locations</h1>
+                <input id="locaddress" name="address" type="address" class="form-control" placeholder="insert address">
+                <input id="loclongitude" name="longitude" type="number" class="form-control" placeholder="longitude">
+                <input id="loclatitude" name="latitude" type="number" class="form-control" placeholder="latitude">
+                <select id="locfoodchain_insert" class="foodchainselector form-control" name="foodchain">
+
+                </select>
+                <button id="locbtn" class="form-control btn-primary btn-block">Insert</button>
+
+
+            </div>
+            <div class="col-lg-6 col-md-6 col-xs-12 col-sm-12">
+                <div class="admintab-a">
+                    <h1>Locations</h1>
+                    <select class="form-control foodchainselector" name="foodchain">
+
+                    </select>
+                    Locations:
+                    <div id="locationslist" class=" list-group" style="height:300px;overflow-y:scroll;">
+                        <div class="list-group-item ">
+                            <div id="4jkfgsuf9s8uf9s" class="foodchain-location">
+                                <div class="locationfoodchain">Macdonalds</div>
+                                <div class="locationaddress">Rua Pedro Farinhas e ques 22, Cena</div>
+                                <div class="locationcoords">latitude
+                                    <span class="locationcoords_lat">40,00030</span> longitude:
+                                    <span class="locationcoords_lng">9.0000</span>
+                                </div>
+                            </div>
+                            <div style="margin-top:15px;" class="btn-group btn-group-sm" role="group">
+                                <button type="button" class="btn btn-secondary btn-danger removeloc">remove</button>
+                                <button type="button" class="btn btn-secondary btn-default checkloc">check</button>
+                                <button type="button" class="btn btn-secondary btn-info editloc" data-editmode=false data-back="" ; data-id="4jkfgsuf9s8uf9s">edit</button>
+                            </div>
+                        </div>
+                        <div class="list-group-item ">
+                            <div id="4jkfgsuf9f9s" class="foodchain-location">
+                                <div class="locationfoodchain">Macdonalds</div>
+                                <div class="locationaddress">Rua Pedro Farinhas e ques 22, Cena</div>
+                                <div class="locationcoords">latitude
+                                    <span class="locationcoords_lat">40,00030</span> longitude:
+                                    <span class="locationcoords_lng">9.0000</span>
+                                </div>
+                            </div>
+                            <div style="margin-top:15px;" class="btn-group btn-group-sm" role="group">
+                                <button type="button" class="btn btn-secondary btn-danger removeloc">remove</button>
+                                <button type="button" class="btn btn-secondary btn-default checkloc">check</button>
+                                <button type="button" class="btn btn-secondary btn-info editloc" data-id="4jkf9s8uf9s">edit</button>
+                            </div>
+                        </div>
+
+
+                    </div>
+                    <div id="mapholder" style="margin:15px auto;height:350px;border:black 2px solid;">
+                    </div>
+                </div>
+
+            </div>
+        </div>
+        <!-- SEARCHES META-DATA -->
+        <div class="row">
+            <div style="font-size:3em;color:white;" class="col-lg-12 text-center">
+                USER ACTIVITY
+            </div>
+        </div>
+        <div style="margin-top:15px;" class="row">
+            <div class=" admintab-b  col-lg-6 col-md-4 col-xs-12 col-sm-12">
+                <h1> Daily Searchs </h1>
+                <canvas id="dailysearches" width="400" height="400"></canvas>
+
+
+
+
+
+
+            </div>
+            <div class="admintab-b col-lg-6 col-md-6 col-xs-12 col-sm-12">
+                <h1> Top 10 Countries</h1>
+                <!--  <div id="heatmap" style="margin:15px auto;height:350px;border:black 2px solid;"></div> -->
+                <canvas id="countrylist" width="400" height="400"></canvas>
+            </div>
+        </div>
+        <div class="row">
+            <div style="font-size:3em;color:white;" class="col-lg-12 text-center">
+                FOODCHAIN MANAGMENT
+            </div>
+        </div>
+        <!-- FOODCHAINS MANAGMENT -->
+        <div style="margin-top :15px;margin-bottom:50px;" class="row">
+            <div class="col-lg-4 admintab-a">
+                <div class="list-group foodchainpanel">
+                    <div class="list-group-item">
+                        <div>
+                            <div style="height:50px;width:50px;background-color:darkgrey"></div>
+                        </div>
+                        <div>Name: Macdonalds</div>
+                        <div>Contact: 21236555</div>
+                        <div>Info: American Chain </div>
+                    </div>
+
+                </div>
+            </div>
+            <div class="col-lg-4 admintab-a">
+                <div class="legend">
+                    TPAO(Times Presented As Option) TC(Times Chosen) ARWC(Average Rank When Choosen) ARWPAO(Average Rank When Presented As Option)
+                    MDEC(Max Distance Ever Choosen) AVDWC(Average Distance When Choosen)
+
+                </div>
+                <div class="foodchainstats">
+                    <div>TPAO
+                        <span class="stat-result">293939</span>
+                    </div>
+                    <div>TC
+                        <span class="stat-result">129493</span>
+                    </div>
+                    <div>ARWC
+                        <span class="stat-result">3rd</span>
+                    </div>
+                    <div>ARWPAO
+                        <span class="stat-result">5th</span>
+                    </div>
+                    <div>MDEC
+                        <span class="stat-result">10Km</span>
+                    </div>
+                    <div>AVDWC
+                        <span class="stat-result">3.32km</span>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-4 admintab-a foochaininsertpanel">
+                <div class="">
+                    <div>
+                        <span> Add Foodchain</span>
+                        <input type="text" class="txtBrandName form-control" placeholder="Brand Name" />
+                        <input type="text" class="txtBrandInfo form-control" placeholder="Brand Info" />
+                        <input type="text" class="txtBrandContacts form-control" placeholder="Brand Contacts" />
+                        <button id="addFoodChainBtn" class="btn btn-success">Add</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- USERS MANAGMENT -->
+        <div class="row">
+            <div style="font-size:3em;color:darkgrey;" class="col-lg-12 text-center">
+                USERS MANAGMENT
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-lg-12">
+                <h1>USERS</h1>
+                <div class="list-group" style="width:200px;overflow-y:scroll;height:300px;">
+                    <div class="list-group-item">
+                        <div>JoaquimUser</div>
+                        <div>joaquim@gmail.com</div>
+                    </div>
+                    <div class="list-group-item">
+                        <div>JoaquimUser</div>
+                        <div>joaquim@gmail.com</div>
+                    </div>
+                    <div class="list-group-item">
+                        <div>JoaquimUser</div>
+                        <div>joaquim@gmail.com</div>
+                    </div>
+                    <div class="list-group-item">
+                        <div>JoaquimUser</div>
+                        <div>joaquim@gmail.com</div>
+                    </div>
+                    <div class="list-group-item">
+                        <div>JoaquimUser</div>
+                        <div>joaquim@gmail.com</div>
+                    </div>
+                    <div class="list-group-item">
+                        <div>JoaquimUser</div>
+                        <div>joaquim@gmail.com</div>
+                    </div>
+                    <div class="list-group-item">
+                        <div>JoaquimUser</div>
+                        <div>joaquim@gmail.com</div>
+                    </div>
+                    <div class="list-group-item">
+                        <div>JoaquimUser</div>
+                        <div>joaquim@gmail.com</div>
+                    </div>
+                    <div class="list-group-item">
+                        <div>JoaquimUser</div>
+                        <div>joaquim@gmail.com</div>
+                    </div>
+                    <div class="list-group-item">
+                        <div>JoaquimUser</div>
+                        <div>joaquim@gmail.com</div>
+                    </div>
+                    <div class="list-group-item">
+                        <div>JoaquimUser</div>
+                        <div>joaquim@gmail.com</div>
+                    </div>
+                    <div class="list-group-item">
+                        <div>JoaquimUser</div>
+                        <div>joaquim@gmail.com</div>
+                    </div>
+
+                </div>
+
+            </div>
+        </div>
+
+
+
+
+
+
+    </div>
+    <script>
+        function initMap() {
+            geocoder = new google.maps.Geocoder;
+
+            var uluru = { lat: -10.363, lng: 101.044 };
+            var map = new google.maps.Map(document.getElementById('mapholder'), {
+                zoom: 12,
+                center: { lat: locationsmapcenter[0], lng: locationsmapcenter[1] }
+            });
+
+            console.log("maps: " + currentmarkerposition);
+            currentmarker = new google.maps.Marker({
+
+                position: { lat: currentmarkerposition[0], lng: currentmarkerposition[1] },
+                map: map
+            });
+
+
+
+
+        }
+        function getRandomArbitrary(min, max) {
+            return Math.random() * (max - min) + min;
+        }
+
+
+    </script>
+    <script async defer src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDraT4ybwLo3vOLSYl-4CUPSRbSNJt9Zk4&callback=initMap"></script>
+
+
+</body>
+
+</html>
