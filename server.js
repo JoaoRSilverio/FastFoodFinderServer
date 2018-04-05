@@ -793,6 +793,48 @@ app.get('/geosearch', checkauth, function (req, res) {
 
 })
 // admin calls
+app.post('/edituser',checkauthadmin,function(req,res){
+
+    /*  username:String,
+    role:String,
+    password:String,
+    email:String,
+    points:Number,
+    profileimage:String,
+    activefoodchains:[String],
+    productsubscriptions:[] */
+
+if(req.body.id && req.body.username && req.body.email && req.body.activefoodchains){
+    Account.findById({_id:req.body.id},function(err,user){
+        user.username = req.body.username;
+        user.email = req.body.email;
+        user.activefoodchains = req.body.activefoodchains;
+
+        user.save(function(err){
+            err ? res.send({message:"error saving user: " + user.username}): res.send({message:"success"});
+        })
+    });
+    
+
+}else{
+    res.send({message:'incomplete request'})
+}
+
+})
+app.post('/allusers',checkauthadmin,function(req,res){
+    Account.find(function(err,results){
+        res.send(results);
+    })
+})
+app.post('/removeuser',checkauth,function(req,res){
+    if(req.body.id){
+        Account.findByIdAndRemove({_id:req.body.id},function(err,user){
+            console.log(user.username + " removed");
+            res.send({message:user.username + ' removed'});
+        })
+    }
+})
+
 app.post('/addfoodchain', checkauthadmin, function (req, res) {
     console.log("/addfoodchain");
     console.log("                              <-- adding " + req.body.name + " to db");
