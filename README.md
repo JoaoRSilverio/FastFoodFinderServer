@@ -8,3 +8,8 @@ server/adminlogin --> server/dashboard
 dm me for db access and stuff if you want.
 
 its all good in the hood.
+
+#TODO
+- add distance to each element in /geosearch
+- add /action to server
+- add client management to dashboard
