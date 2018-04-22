@@ -81,7 +81,7 @@ const LOCAL_DEV = MYKEYS.DBPATH_LOCAL;
 const DEV = MYKEYS.DBPATH_LIVE;
 
 //// local test
-var db = mongoose.connect(DEV)
+var db = mongoose.connect(LOCAL_DEV)
     .then((response) => {
         console.log("connection succesfull!!!");
     }, err => {
@@ -228,7 +228,7 @@ var UserLocationsModel = mongoose.model('userlocation', userlocationschema);
 var EntityModel = mongoose.model('entity', entityschema);
 var WantedItemModel = mongoose.model('wanted', wantedschema);
 var ProductItemModel = mongoose.model('product', productschema);
-var ProductLocationModel = mongoose.model('productlocation', productlocationschema);
+var FastFoodLocationModel = mongoose.model('productlocation', productlocationschema);
 ////////////////////
 // QUERYS 
 ////////////////////
@@ -301,7 +301,7 @@ app.get('/locations', checkauth, function (req, res) {
 
         }
 
-        ProductLocationModel.find({ _id: { $in: userlocation[0].locationsid } }, function (err, locations) {
+        FastFoodLocationModel.find({ _id: { $in: userlocation[0].locationsid } }, function (err, locations) {
             if (err) {
                 return res.send({ message: "error" });
             }
@@ -395,7 +395,7 @@ app.post('/addproducts', function (req, res) {
     console.log("/addproducts");
     // starting up models
     var addeproduct = new ProductItemModel();
-    var newproductlocation = new ProductLocationModel();
+    var newproductlocation = new FastFoodLocationModel();
     var locationobj = { type: String, coordinates: [] };
     // filling object details
     addeproduct.name = req.body.name;
@@ -454,7 +454,7 @@ app.post('/removeproduct', function (req, res) {
             }
             WantedItemModel.findById(req.body.id, function (err, resultitem) {
                 if (resultitem == null) {
-                    ProductLocationModel.deleteMany({ productid: req.body.id }, function (err) {
+                    FastFoodLocationModel.deleteMany({ productid: req.body.id }, function (err) {
                         if (err) {
                             console.log("error getting locations to delete");
                         }
@@ -613,13 +613,6 @@ app.post('/subscribe', checkauth, function (req, res) {
 
 
 
-
-
-
-
-
-
-
 app.get('/scanlist', checkauth, function (req, res) {
     console.log("/scanlist");
 
@@ -671,6 +664,14 @@ app.get('/scanlist', checkauth, function (req, res) {
 
 })
 
+app.post('/choosenResult',checkauth,function(req,res){
+    console.log('/choosenResult');
+    console.log('searchid:'+req.body.searchid + ' resultid: ' + req.body.resultid);
+  ActionModel.update({searchid:req.body.searchid},{finaldecision:{foodchainid:req.body.resultid}},(err)=>{
+      err?console.log('couldnt log result' + err):res.send({message:'ok'});   
+  })
+    
+})
 //scan geosearch
 // geosearch?distance=num&foodchains[]=1&foodchains[]=2&longitude=num&latitude=num
 app.get('/geosearch', checkauth, function (req, res) {
@@ -681,7 +682,7 @@ app.get('/geosearch', checkauth, function (req, res) {
         return res.send("missing parameters");
 
     }
-    var displayelement = [];
+    var displayelement ={searchid:'', data:[]};
 
     var distance = req.query.distance || 1000;
     var searchterm = req.query.productid;
@@ -754,18 +755,20 @@ app.get('/geosearch', checkauth, function (req, res) {
                                 });
                             })
 
-                            displayelement.push({ foodchain: fc, locations: results });
+                            displayelement.data.push({ foodchain: fc, locations: results });
                             done.push(true);
                             console.log(done.length + " of " + user.activefoodchains.length + " querys")
                         }
                         if (done.length == user.activefoodchains.length) {
-                            displayelement.forEach(function (element) {
+                            displayelement.data.forEach(function (element) {
                                 element.locations.forEach(function (loc) {
                                     metasearch.results.push(loc.id);
                                 })
 
                             })
+                           
                             metasearch.save();
+                            displayelement.searchid = metasearch.id;
                             console.log("send results");
                             console.log(displayelement);
                             return res.send(displayelement);
@@ -821,6 +824,12 @@ if(req.body.id && req.body.username && req.body.email && req.body.activefoodchai
 }
 
 })
+app.post('/removelocation',checkauthadmin,function(req,res){
+    console.log('removing ' + req.body.locationid)
+   FastFoodLocationModel.findByIdAndRemove({_id:req.body.locationid},(err)=>{
+       err?res.send({message:'error'}):res.send({message:'deleted'});
+   })
+})
 app.post('/allusers',checkauthadmin,function(req,res){
     Account.find(function(err,results){
         res.send(results);
@@ -828,6 +837,7 @@ app.post('/allusers',checkauthadmin,function(req,res){
 })
 app.post('/removeuser',checkauth,function(req,res){
     if(req.body.id){
+       
         Account.findByIdAndRemove({_id:req.body.id},function(err,user){
             console.log(user.username + " removed");
             res.send({message:user.username + ' removed'});
@@ -869,7 +879,7 @@ app.post('/foodchaindetails', checkauthadmin, function (req, res) {
 })
 
 app.get('/alllocations', checkauthadmin, function (req, res) {
-    ProductLocationModel.find({}, function (err, results) {
+    FastFoodLocationModel.find({}, function (err, results) {
         if (err) {
             console.log("error");
             res.send("error");
@@ -881,7 +891,7 @@ app.get('/alllocations', checkauthadmin, function (req, res) {
 app.post('/addfoodchainlocation', checkauthadmin, function (req, res) {
     /// receives longitude,latitude,foodchainid,address
     console.log("/addfoodchainlocation");
-    var newlocation = ProductLocationModel();
+    var newlocation = FastFoodLocationModel();
 
     newlocation.name = req.body.name;
     var locationobj = { type: String, coordinates: [] };

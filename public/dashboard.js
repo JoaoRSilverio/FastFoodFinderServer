@@ -112,7 +112,7 @@ $(function () {
         return htmlstring;
     }
     function InputValidator(text, valtype) {
-        textpattern = /^[a-zA-Z0-9-ºª ]{1,32}$/g;
+        textpattern = /^[a-zA-Z0-9-ºª ]{1,64}$/g;
         coordspatern = /^[0-9-]{1,2}\.[0-9]{1,6}$/g;
         switch (valtype) {
             case "text":
@@ -215,6 +215,10 @@ $(function () {
         // console.log($(this).data("back"));
         // $(id).html( "SELECTED" );
     }));
+    $("body").on("click",".removeloc",function(){
+       
+        _Data.removeLocation($(this).data("id"));
+    });
 
 
     // Interfaces
@@ -248,6 +252,9 @@ $(function () {
     function LocationItemManager() {
 
         this.locationItems = [];
+        this.clearItems = function(){
+            this.locationItems = [];
+        }
         this.add = function (locationitem) {
             this.locationItems.push(locationitem);
         }
@@ -259,6 +266,8 @@ $(function () {
         }
         // fill container with items
         this.refresh = function () {
+            this.element.html('');
+            this.element.html(bootAlert("Loading", "...connected", "info"));
             if (this.locationItems.length == 0) {
                 return "list empty"
             }
@@ -275,19 +284,21 @@ $(function () {
                     + "longitude:<span class='locationcoords_lng'>" + this.locationItems[i].lng + "</span></div>"
                     + "</div>"
                     + "<div style='margin-top:15px;' class='btn-group btn-group-sm' role='group'>"
-                    + "<button type='button' class='btn btn-secondary btn-danger removeloc'>remove</button>"
+                    + "<button type='button' class='btn btn-secondary btn-danger removeloc' data-id='" + this.locationItems[i].id + "'>remove</button>"
                     + "<button type='button' class='btn btn-secondary btn-default checkloc'"
                     + " data-lat='" + this.locationItems[i].lat + "' data-lng='" + this.locationItems[i].lng + "' >"
                     + "check</button>"
                     + "<button type='button' class='btn btn-secondary btn-info editloc' data-editmode=false data-back='' data-id='" + this.locationItems[i].id + "'>edit</button>"
                     + "</div>"
                     + "</div>";
+                
                 this.element.html(htmlstring);
             }
         }
         this.showerror = function (errordescription) {
             this.element.html(bootAlert("error", errordescription, "danger"));
         }
+       
     }
     function StatsManager() {
         this.topTenCountrys = function (chart) {
@@ -406,6 +417,7 @@ $(function () {
             })
         }
         this.getFoodChainsLocations = function (LocaMan) {
+            LocaMan.clearItems();
             fc = $.get('/alllocations');
             fc.done(function (data) {
                 if (data == "error" || data.length == 0) {
@@ -430,6 +442,15 @@ $(function () {
                     panel.append(bootAlert("success", "location saved successfully!!", alertModes.success));
 
                 }
+            })
+        }
+        this.removeLocation = function(locationid){
+            var model = {locationid:locationid};
+            console.log(model.locationid);
+            var rl = $.post('/removelocation',model);
+            rl.done((data)=>{
+              alert(data.message);
+                this.getFoodChainsLocations(_LocMan);
             })
         }
         this.getFoodChains = function (element) {
